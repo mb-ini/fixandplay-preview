@@ -94,12 +94,7 @@ a:hover { color: var(--accent-hover); }
 .brand:hover { color: var(--navy); }
 .brand-name { font-size: 16px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
 @media (min-width: 420px) { .brand-name { font-size: 17px; } }
-.logo-ph {
-  flex: none; width: 36px; height: 36px;
-  border: 1.5px dashed var(--ph-line); border-radius: var(--radius);
-  display: grid; place-items: center;
-  font-size: 10px; font-weight: 600; color: var(--muted);
-}
+.logo { flex: none; width: 40px; height: 40px; border-radius: 50%; }
 .header-tools { grid-area: tools; display: flex; align-items: center; gap: 6px; }
 .lang {
   min-height: 44px; min-width: 44px; padding: 0 10px;
@@ -273,6 +268,15 @@ a:hover { color: var(--accent-hover); }
 .ph--new .ph__label { color: var(--todo-ink); border-color: var(--todo-line); background: var(--todo-bg); letter-spacing: 0.02em; text-transform: none; font-size: 12px; }
 .ph__text { font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
 
+/* Photos (processed WebP in /assets/photos/, see manifest.json) */
+.photo {
+  display: block; width: 100%; height: auto;
+  object-fit: cover; object-position: center;
+  border-radius: var(--radius); background: var(--bg-alt);
+}
+.photo--hero { aspect-ratio: 4 / 3; }
+.photo--tall { aspect-ratio: 3 / 4; }
+
 /* ---------- Info strip ---------- */
 .strip { background: var(--bg-alt); padding: 24px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .strip ul {
@@ -406,12 +410,24 @@ table.hours td { text-align: right; padding: 12px 0; font-weight: 600; }
 }
 .tt-card { display: flex; flex-direction: column; gap: 8px; }
 .tt-facade {
+  position: relative; isolation: isolate; overflow: hidden;
   width: 100%; aspect-ratio: 9 / 14;
   border: 0; border-radius: var(--radius); cursor: pointer;
   background: linear-gradient(160deg, #13315C 0%, var(--navy) 70%);
   color: #fff; font: inherit; text-align: left;
   display: flex; flex-direction: column; justify-content: space-between; padding: 14px;
 }
+/* decorative local thumbnail under the play icon; the overlay keeps the title readable */
+.tt-thumb {
+  position: absolute; inset: 0; z-index: -2;
+  width: 100%; height: 100%; max-width: none;
+  object-fit: cover; object-position: center;
+}
+.tt-facade::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(180deg, rgba(11, 31, 58, 0.15) 0%, rgba(11, 31, 58, 0.05) 40%, rgba(11, 31, 58, 0.9) 100%);
+}
+.tt-facade .tt-title, .tt-facade .tt-meta { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); }
 .tt-facade:hover .tt-play { background: var(--accent-hover); }
 .tt-play {
   align-self: center; margin-top: 30%;
@@ -501,3 +517,6 @@ fieldset.field { border: 0; padding: 0; margin: 0; }
 }
 .foot-list--pages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; }
 @media (min-width: 1024px) { .foot-list--pages { grid-template-columns: 1fr; } }
+
+/* Demo phase: link to the original photo on Facebook (remove at launch) */
+.src-link { display: inline-block; margin-top: 6px; font-size: 12px; color: var(--muted, #4A576C); text-decoration: underline; min-height: 24px; }
