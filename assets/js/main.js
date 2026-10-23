@@ -1,12 +1,47 @@
 /* Fix & Play Service GSM: small vanilla helpers. No tracking, no cookies, no storage.
    - WhatsApp forms: compose a message and open wa.me. Nothing is sent to any server.
    - Price search: filters the inline JSON in #price-data.
-   - TikTok: the player loads only after a click (click-to-load facade). */
+   - TikTok: the player loads only after a click (click-to-load facade).
+   - Review mode (team only): ?review in the URL highlights the .pending texts and keeps ?review on internal links. */
 (function () {
   'use strict';
 
   var WA = 'https://wa.me/40769146666';
   var lang = (document.documentElement.lang || 'ro').slice(0, 2);
+
+  /* ---- Review mode: html.review shows the neutral texts that wait for the owner's answers (class
+     "pending"; see style.css). Customers never get the class. The mode lives only in the URL: the
+     ?review token is copied onto same-origin links and GET forms, so it stays on while navigating. ---- */
+  var REVIEW = 'review';
+  if (new URLSearchParams(window.location.search).has(REVIEW)) {
+    document.documentElement.classList.add(REVIEW);
+    // same token the page was opened with ("review" or "review="), so a link to this same page
+    // plus a #hash differs only in the hash and scrolls instead of reloading
+    var token = window.location.search.slice(1).split('&').filter(function (p) {
+      return p.split('=')[0] === REVIEW;
+    })[0] || REVIEW + '=';
+    var sameOrigin = function (raw) {
+      try {
+        var u = new URL(raw, window.location.href);
+        return u.origin === window.location.origin ? u : null;
+      } catch (e) { return null; }
+    };
+    Array.prototype.forEach.call(document.links, function (a) {
+      var raw = a.getAttribute('href') || '';
+      if (raw.charAt(0) === '#') return; // in-page anchors already keep the current query
+      var u = sameOrigin(raw);
+      if (!u || u.searchParams.has(REVIEW)) return;
+      u.search = (u.search ? u.search + '&' : '?') + token;
+      a.setAttribute('href', u.pathname + u.search + u.hash);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('form[action]'), function (f) {
+      if ((f.getAttribute('method') || 'get').toLowerCase() !== 'get' || f.elements[REVIEW]) return;
+      if (!sameOrigin(f.getAttribute('action'))) return;
+      var h = document.createElement('input');
+      h.type = 'hidden'; h.name = REVIEW; h.value = '';
+      f.appendChild(h);
+    });
+  }
 
   function openWhatsApp(text) {
     var url = WA + '?text=' + encodeURIComponent(text);
@@ -202,6 +237,11 @@
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
   }
+  // neutral "no price yet" texts: marked .pending like the same cells in the static tables
+  var PENDING_PRICES = ['Preț la telefon', 'Call for price'];
+  function price(p) {
+    return PENDING_PRICES.indexOf(p) !== -1 ? '<span class="pending">' + esc(p) + '</span>' : esc(p);
+  }
 
   if (dataEl && qEl && resEl) {
     var data = JSON.parse(dataEl.textContent);
@@ -238,12 +278,14 @@
         statusEl.textContent = data.none;
         return;
       }
-      var max = 12;
-      statusEl.textContent = groups.length > max ? data.many.replace('{n}', groups.length).replace('{max}', max)
-        : data.found.replace('{n}', groups.length);
+      // Romanian count agreement: "1 rezultat" (found1), "2-12 rezultate" (found); above max the
+      // "many" text names no count, so it never needs "de" (20 de rezultate). 0 results use "none" above.
+      var max = 12, n = groups.length;
+      statusEl.textContent = n > max ? data.many.replace('{n}', n).replace('{max}', max)
+        : (n === 1 && data.found1 ? data.found1 : data.found).replace('{n}', n);
       resEl.innerHTML = groups.slice(0, max).map(function (g) {
         return '<article class="result"><h3>' + esc(g.m) + '</h3><dl>' + g.rows.map(function (r) {
-          return '<dt>' + esc(r.c + (r.i ? ': ' + r.i : '')) + '</dt><dd>' + esc(r.p) +
+          return '<dt>' + esc(r.c + (r.i ? ': ' + r.i : '')) + '</dt><dd>' + price(r.p) +
             (r.s ? ' <span class="mark" aria-hidden="true">*</span>' : '') +
             (r.n ? '<small>' + esc(r.n) + '</small>' : '') + '</dd>';
         }).join('') + '</dl></article>';

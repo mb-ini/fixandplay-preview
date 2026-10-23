@@ -34,6 +34,8 @@
   --todo-bg: #FFF1D6;
   --todo-line: #B7791F;
   --todo-box: #FFF8EA;
+  --pending-bg: #FEF3C7;
+  --pending-line: #D97706;
   --foot-ink: #E6ECF5;
   --foot-muted: #C9D3E2;
   --radius: 6px;
@@ -184,6 +186,7 @@ a:hover { color: var(--accent-hover); }
 /* ---------- Generic sections ---------- */
 .section { padding: 40px 0; border-top: 1px solid var(--line); }
 .section--first { border-top: 0; }
+.strip + .section { border-top: 0; }
 .section--alt { background: var(--bg-alt); }
 .eyebrow {
   font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
@@ -225,6 +228,32 @@ a:hover { color: var(--accent-hover); }
   border-radius: var(--radius); padding: 12px 14px;
 }
 .todo-box strong { color: var(--todo-ink); }
+
+/* Review mode, for the team only (main.js adds html.review when the URL has ?review).
+   Class "pending" marks the neutral texts that stand in for the owner's answers
+   ("Preț la telefon", holiday hours, "Dacă nu ne găsești..."). It has no style by default,
+   so customers see the page unchanged. */
+html.review .pending {
+  background: var(--pending-bg);
+  outline: 2px dashed var(--pending-line); outline-offset: 1px;
+  border-radius: 3px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+html.review p.pending { padding: 2px 6px; }
+html.review td.pending { outline-offset: -3px; }
+html.review .site-footer { padding-bottom: 104px; } /* room for the banner below */
+html.review body::after {
+  /* "Mod verificare: textele marcate așteaptă răspunsul proprietarului" (ș and ă as CSS escapes) */
+  content: "Mod verificare: textele marcate a\219 teapt\103  r\103 spunsul proprietarului";
+  position: fixed; left: 8px; bottom: 8px; z-index: 1000;
+  max-width: calc(100vw - 16px);
+  padding: 5px 10px;
+  font-size: 12px; font-weight: 600; line-height: 1.35;
+  color: var(--todo-ink); background: var(--pending-bg);
+  border: 2px dashed var(--pending-line); border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(11, 31, 58, 0.18);
+  pointer-events: none;
+}
 
 /* ---------- Hero ---------- */
 .hero { padding: 32px 0 40px; }
@@ -467,7 +496,7 @@ table.hours td { text-align: right; padding: 12px 0; font-weight: 600; }
 /* ---------- FAQ ---------- */
 .faq { display: flex; flex-direction: column; max-width: 820px; border-top: 1px solid var(--line); }
 .faq-item { padding: 18px 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
-.faq-item h3 { font-size: 17px; line-height: 1.35; }
+.faq-item h2, .faq-item h3 { font-size: 17px; line-height: 1.35; }
 .faq-item p, .faq-item ul { color: var(--ink-2); font-size: 15.5px; }
 .faq-item ul { padding-left: 20px; }
 
