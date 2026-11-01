@@ -1014,3 +1014,12 @@ fieldset.field { border: 0; padding: 0; margin: 0; }
 .hrs-r { display: contents; }
 .hrs-r > span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; }
 .foot-addr .hrs-r > span:last-child { color: var(--foot-ink); }
+
+/* photos in the same side-scrolling row as the TikTok clips (home, Din atelier): same card height */
+.tt-card--photo figure { display: flex; flex-direction: column; gap: 6px; }
+.tt-photo { aspect-ratio: 9 / 14; }
+.tt-card--photo figcaption { font-size: 13.5px; line-height: 1.4; }
+/* the mixed row (4 clips + 4 photos) stays a side-scrolling row on every width, so desktop gets one row, not two tall ones */
+@media (min-width: 760px) {
+  .tt-list--mixed { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 220px; overflow-x: auto; }
+}
