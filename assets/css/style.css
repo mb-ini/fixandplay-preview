@@ -45,7 +45,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: 140px; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 76px; }
 body {
   margin: 0;
   background: var(--bg);
@@ -81,11 +81,12 @@ a:hover { color: var(--accent-hover); }
 }
 .header-inner {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: "brand tools" "cta cta";
+  /* phones and tablets: one row, about 60px (logo, call, WhatsApp, menu); it was two rows and 119px */
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas: "brand cta tools";
   align-items: center;
-  gap: 8px 12px;
-  padding-top: 8px; padding-bottom: 10px;
+  gap: 6px;
+  padding-top: 8px; padding-bottom: 8px;
 }
 .brand {
   grid-area: brand;
@@ -97,6 +98,16 @@ a:hover { color: var(--accent-hover); }
 .brand-name { font-size: 16px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
 @media (min-width: 420px) { .brand-name { font-size: 17px; } }
 .logo { flex: none; width: 40px; height: 40px; border-radius: 50%; }
+/* narrow screens: "Fix & Play" only, so the call button fits on the same row; the full name stays for screen
+   readers (and in the title, the h1 and the footer); below 350px only the logo */
+@media (max-width: 559px) {
+  .brand { gap: 8px; }
+  .logo { width: 36px; height: 36px; }
+  .brand-sub, .cta-num, .cta-label, .header-tools .lang { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .header-tools .lang { display: none; } /* in the menu instead (English) */
+  .cta .btn--wa { width: 44px; padding: 0; }
+}
+@media (max-width: 349px) { .brand-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
 .header-tools { grid-area: tools; display: flex; align-items: center; gap: 6px; }
 .lang {
   min-height: 44px; min-width: 44px; padding: 0 10px;
@@ -115,7 +126,7 @@ a:hover { color: var(--accent-hover); }
   border: 1px solid var(--line); border-radius: var(--radius);
 }
 .nav-mobile > summary::-webkit-details-marker { display: none; }
-@media (max-width: 419px) {
+@media (max-width: 559px) {
   .nav-mobile > summary { padding: 0; width: 44px; justify-content: center; }
   .nav-mobile > summary span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
@@ -124,7 +135,7 @@ a:hover { color: var(--accent-hover); }
   position: absolute; left: 0; right: 0; top: 100%;
   background: var(--bg); border-bottom: 1px solid var(--line);
   box-shadow: 0 12px 24px rgba(11, 31, 58, 0.12);
-  max-height: calc(100vh - 140px); overflow-y: auto;
+  max-height: calc(100vh - 70px); overflow-y: auto; overscroll-behavior: contain;
 }
 .nav-mobile ul { list-style: none; padding: 6px var(--gutter) 12px; margin: 0; }
 .nav-mobile li + li { border-top: 1px solid var(--line); }
@@ -133,13 +144,35 @@ a:hover { color: var(--accent-hover); }
   color: var(--navy); text-decoration: none; font-weight: 500;
 }
 .nav-mobile a[aria-current="page"] { color: var(--accent); font-weight: 600; }
+/* "Servicii" group in the mobile menu (details.nav-sub): collapsed on every page, so the rest of the menu
+   stays in view; on the service pages its summary is highlighted (is-current).
+   Its links sit indented under it; the 1px separators of ".nav-mobile li + li" apply to them on purpose. */
+.nav-mobile .nav-sub > summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px;
+  color: var(--navy); font-weight: 500;
+}
+.nav-mobile .nav-sub > summary::-webkit-details-marker { display: none; }
+.nav-mobile .nav-sub > summary svg { flex: none; margin-right: 2px; }
+.nav-mobile .nav-sub[open] > summary svg { transform: rotate(180deg); }
+.nav-mobile .nav-sub > summary.is-current { color: var(--accent); font-weight: 600; }
+.nav-mobile .nav-sub > ul { padding: 0 0 4px 16px; border-top: 1px solid var(--line); }
+.nav-mobile .nav-sub a { min-height: 44px; font-size: 15px; }
+/* Once Servicii is opened the menu can be taller than the panel limit: dvh keeps its last row above the phone's
+   browser bars (browsers without dvh keep the 100vh rule above); with a review key, also above the review
+   bar (126px = panel top 118px + 8px gap). */
+.nav-mobile .menu-panel { max-height: calc(100dvh - 70px); }
+html.review-key .nav-mobile .menu-panel { max-height: calc(100vh - 68px - var(--rv-bar-h, 120px)); max-height: calc(100dvh - 68px - var(--rv-bar-h, 120px)); }
+/* secondary items (Status reparație, Buy-back, English): smaller rows at the end of the menu */
+.nav-mobile li.nav-minor a { min-height: 44px; font-size: 14.5px; color: var(--ink-2); font-weight: 400; }
+.nav-mobile li:not(.nav-minor) + li.nav-minor { border-top: 2px solid var(--line); margin-top: 4px; }
 
 .nav-desktop { display: none; }
 
 .cta {
   grid-area: cta;
-  display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
-  gap: 8px;
+  display: grid; grid-template-columns: auto auto;
+  gap: 6px;
 }
 .btn {
   min-height: 48px; padding: 0 14px;
@@ -151,8 +184,7 @@ a:hover { color: var(--accent-hover); }
 }
 .btn svg { flex: none; }
 .btn--call { background: var(--accent); color: #fff; font-size: 16px; font-weight: 700; white-space: nowrap; }
-.cta .btn { padding: 0 10px; gap: 6px; }
-@media (max-width: 360px) { .cta .btn--call { font-size: 14.5px; } .cta .btn--wa { font-size: 14px; } }
+.cta .btn { min-height: 44px; padding: 0 12px; gap: 6px; }
 .btn--call:hover { background: var(--accent-hover); color: #fff; }
 .btn--wa { background: #fff; color: var(--navy); border-color: var(--navy); }
 .btn--wa:hover { background: var(--accent-tint); color: var(--navy); }
@@ -160,6 +192,16 @@ a:hover { color: var(--accent-hover); }
 .btn--primary:hover { background: var(--accent-hover); color: #fff; }
 .btn--outline { background: #fff; color: var(--navy); border-color: var(--navy); }
 .btn--outline:hover { background: var(--accent-tint); color: var(--navy); }
+
+/* Phone held sideways: the header goes on one row (logo, call, WhatsApp, EN, menu), about 57px instead of
+   119px. The business name stays for screen readers. The header stays sticky (the menu panel hangs from it). */
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 1023px) {
+  html { scroll-padding-top: 80px; }
+  .header-inner {
+    padding-top: 6px; padding-bottom: 6px;
+  }
+  .nav-mobile .menu-panel { max-height: calc(100dvh - 70px); }
+}
 
 @media (min-width: 1024px) {
   html { scroll-padding-top: 140px; }
@@ -169,7 +211,7 @@ a:hover { color: var(--accent-hover); }
     gap: 6px 16px;
     padding-top: 10px; padding-bottom: 0;
   }
-  .cta { grid-template-columns: auto auto; }
+  .cta .btn { min-height: 48px; }
   .btn--call { padding: 0 20px; }
   .btn--wa { padding: 0 18px; }
   .nav-mobile { display: none; }
@@ -181,6 +223,27 @@ a:hover { color: var(--accent-hover); }
   }
   .nav-desktop a:hover { background: var(--bg-alt); }
   .nav-desktop a[aria-current="page"] { color: var(--accent); font-weight: 600; box-shadow: inset 0 -2px 0 var(--accent); border-radius: 0; }
+  /* "Servicii" dropdown (details.nav-sub): the list opens under its summary, over the page; it is absolute,
+     so the header does not move. main.js closes it on an outside click, Esc, focus leaving it, a chosen link. */
+  .nav-desktop .has-sub { position: relative; }
+  .nav-desktop .nav-sub > summary {
+    list-style: none; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 6px 0 8px;
+    color: var(--navy); font-size: 14.5px; font-weight: 500; border-radius: var(--radius);
+  }
+  .nav-desktop .nav-sub > summary::-webkit-details-marker { display: none; }
+  .nav-desktop .nav-sub > summary:hover, .nav-desktop .nav-sub[open] > summary { background: var(--bg-alt); }
+  .nav-desktop .nav-sub[open] > summary svg { transform: rotate(180deg); }
+  .nav-desktop .nav-sub > summary.is-current { color: var(--accent); font-weight: 600; box-shadow: inset 0 -2px 0 var(--accent); border-radius: 0; }
+  .nav-desktop .nav-sub > ul {
+    position: absolute; top: 100%; left: 0; z-index: 1;
+    display: block; min-width: 248px; margin: 0; padding: 6px 0;
+    background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: 0 12px 24px rgba(11, 31, 58, 0.12);
+  }
+  .nav-desktop .nav-sub a { display: flex; min-height: 44px; padding: 0 16px; font-size: 15px; white-space: nowrap; border-radius: 0; }
+  .nav-desktop .nav-sub a[aria-current="page"] { box-shadow: inset 3px 0 0 var(--accent); background: var(--accent-tint); }
+  .nav-desktop .nav-sub a:focus-visible { outline-offset: -3px; }
 }
 
 /* ---------- Generic sections ---------- */
@@ -196,11 +259,14 @@ a:hover { color: var(--accent-hover); }
 .h1--page { font-size: clamp(28px, 3.4vw, 40px); }
 .h2 { font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
 .h3 { font-size: 18px; line-height: 1.3; font-weight: 600; }
-.lead { font-size: 17px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; max-width: 760px; }
-.prose { max-width: 760px; color: var(--ink-2); }
+.lead { font-size: 17px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+.prose { color: var(--ink-2); }
 .prose p + p { margin-top: 10px; }
 .small { font-size: 13.5px; line-height: 1.5; color: var(--muted); }
-.note { font-size: 13.5px; line-height: 1.5; color: var(--muted); max-width: 760px; }
+.note { font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+.nowrap { white-space: nowrap; } /* keeps a time range such as 11:00–18:00 on one line */
+/* text blocks: about 80 characters per line on desktop (tables and the FAQ list keep their 760/820px) */
+.lead, .prose, .note, .faq-item p, .faq-item ul { max-width: 60ch; }
 .more-link {
   align-self: flex-start;
   display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
@@ -209,10 +275,12 @@ a:hover { color: var(--accent-hover); }
 }
 .more-link:hover { color: var(--accent); text-decoration-color: currentColor; }
 .section-head { display: flex; flex-direction: column; gap: 6px; }
-.breadcrumb { font-size: 13.5px; color: var(--muted); }
+.breadcrumb { font-size: 13.5px; color: var(--muted); padding-top: 14px; }
 .breadcrumb ol { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
 .breadcrumb li + li::before { content: "›"; margin-right: 4px; color: var(--ph-line); }
 .breadcrumb a { color: var(--muted); }
+.breadcrumb a:hover { color: var(--navy); }
+.breadcrumb + .section--first { padding-top: 24px; }
 
 /* "de completat" / "de confirmat" markers */
 .todo {
@@ -254,6 +322,221 @@ html.review body::after {
   box-shadow: 0 4px 12px rgba(11, 31, 58, 0.18);
   pointer-events: none;
 }
+
+/* Owner comments: review mode with a key (?review=<KEY>; main.js adds html.review-key and builds every
+   element below, class prefix "rv-"). Customers never get them. The bottom bar replaces the banner above;
+   --rv-bar-h is its live height, set by main.js, so the footer and focused fields stay above it. */
+html.review-key body::after { content: none; }
+html.review-key { scroll-padding-bottom: calc(var(--rv-bar-h, 120px) + 8px); }
+html.review-key .site-footer { padding-bottom: calc(var(--rv-bar-h, 120px) + 24px); }
+.rv-ui[hidden], .rv-panel[hidden], .rv-panel__empty[hidden] { display: none !important; }
+.rv-btn {
+  min-height: 40px; padding: 0 12px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font: inherit; font-size: 14px; font-weight: 600; line-height: 1.2; text-align: center;
+  color: var(--navy); background: #fff;
+  border: 1.5px solid var(--navy); border-radius: var(--radius); cursor: pointer;
+}
+.rv-btn--primary { color: #fff; background: var(--navy); }
+@media (hover: hover) {
+  .rv-btn:hover { background: var(--accent-tint); color: var(--navy); }
+  .rv-btn--primary:hover { color: #fff; background: #13315C; }
+  .rv-btn--reply:hover { color: var(--todo-ink); background: var(--todo-box); }
+}
+.rv-btn:disabled { opacity: 0.65; cursor: progress; }
+.rv-btn--small { min-height: 40px; padding: 0 10px; font-size: 13.5px; }
+.rv-btn[aria-expanded="true"] { background: var(--accent-tint); }
+/* "Răspunde" + "✓ Salvat" next to a yellow text */
+.rv-tools {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin: 3px 0 3px 6px; vertical-align: middle;
+  white-space: normal; text-align: left;
+  -webkit-user-select: none; user-select: none;
+}
+.rv-btn--reply {
+  padding: 0 10px; font-size: 13.5px;
+  color: var(--todo-ink); background: #fff; border-color: var(--pending-line);
+}
+/* in a price cell: on its own line, right-aligned and narrower, so the tables stay as wide as for visitors */
+html.review-key td.pending .rv-tools { display: flex; justify-content: flex-end; margin: 4px 0 0; }
+html.review-key td.pending .rv-btn--reply { padding: 0 6px; font-size: 13px; }
+html.review-key table.prices td.pending { padding-left: 6px; padding-right: 6px; }
+/* a yellow text inside a card link (home: Programare, Status): "Răspunde" goes right after the link, never in
+   it, so in the card grid it takes a row of its own under that card instead of a grid cell */
+html.review-key .cards > .rv-tools { grid-column: 1 / -1; justify-self: start; margin: -4px 0 0; }
+.rv-saved {
+  display: inline-flex; align-items: center; min-height: 24px; margin-left: 6px; padding: 0 8px;
+  font-size: 12.5px; font-weight: 700; line-height: 1.2; white-space: nowrap; vertical-align: middle;
+  color: #14532D; background: #DCFCE7; border: 1px solid #16A34A; border-radius: 999px;
+  -webkit-user-select: none; user-select: none;
+}
+.rv-tools .rv-saved { margin-left: 0; }
+.rv-flash { outline: 3px solid var(--accent) !important; outline-offset: 2px; background-color: var(--accent-tint); }
+/* "Observație" under the selected text (main.js sets top/left) */
+.rv-float {
+  position: absolute; z-index: 25;
+  min-height: 44px; padding: 0 16px; border-radius: 999px;
+  box-shadow: 0 6px 16px rgba(11, 31, 58, 0.3);
+}
+/* bottom bar: help text, status, buttons; the list panel opens above them */
+.rv-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  background: var(--pending-bg); border-top: 2px dashed var(--pending-line);
+  box-shadow: 0 -4px 14px rgba(11, 31, 58, 0.16);
+}
+.rv-bar__inner { max-width: var(--wrap); margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
+.rv-bar__text { font-size: 12.5px; font-weight: 600; line-height: 1.35; color: var(--todo-ink); }
+.rv-bar__status { font-size: 13.5px; font-weight: 600; line-height: 1.35; color: #14532D; }
+.rv-bar__status:empty { display: none; }
+.rv-bar__status--error { color: #9B1C1C; }
+.rv-bar__actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.rv-bar__actions .rv-btn { padding: 0 8px; font-size: 13.5px; }
+@media (min-width: 640px) { .rv-bar__actions { display: flex; flex-wrap: wrap; } .rv-bar__actions .rv-btn { padding: 0 14px; } }
+.rv-panel {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 12px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+}
+.rv-panel__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.rv-panel__title { font-size: 15px; line-height: 1.3; font-weight: 600; }
+.rv-panel__empty { font-size: 14px; color: var(--muted); }
+.rv-panel__note { font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+.rv-list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 10px;
+  max-height: max(140px, min(45vh, calc(100vh - 330px))); overflow-y: auto; overscroll-behavior: contain; /* 140px: phone in landscape */
+}
+.rv-item { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 10px; border-top: 1px solid var(--line); }
+.rv-item:first-child { padding-top: 0; border-top: 0; }
+.rv-item__meta { font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.rv-item__comment { font-size: 14.5px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.rv-quote {
+  margin: 0; padding: 8px 10px; max-height: 7.5em; overflow-y: auto;
+  font-size: 14px; line-height: 1.45; color: var(--ink-2); overflow-wrap: anywhere;
+  background: var(--pending-bg); border-left: 3px solid var(--pending-line); border-radius: 4px;
+}
+.rv-quote--small { align-self: stretch; padding: 4px 8px; font-size: 13px; }
+/* the comment dialog (<dialog>, or a role="dialog" panel where <dialog> is missing) */
+.rv-dialog {
+  width: min(560px, calc(100vw - 16px)); max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px); overflow-y: auto;
+  margin: 8px auto auto; padding: 16px;
+  color: var(--navy); background: #fff; border: 0; border-radius: 10px;
+  box-shadow: 0 20px 48px rgba(11, 31, 58, 0.35);
+}
+@media (min-width: 640px) and (min-height: 600px) { .rv-dialog { margin: auto; } }
+.rv-dialog::backdrop { background: rgba(11, 31, 58, 0.55); }
+.rv-dialog--fallback { position: fixed; top: 8px; left: 0; right: 0; z-index: 1001; }
+.rv-backdrop { position: fixed; inset: 0; z-index: 1000; background: rgba(11, 31, 58, 0.55); }
+.rv-dialog > * + * { margin-top: 10px; }
+.rv-dialog__title { font-size: 18px; line-height: 1.3; font-weight: 600; }
+.rv-dialog__label { display: block; font-size: 14px; font-weight: 600; }
+.rv-dialog .rv-quote + .rv-dialog__label { margin-top: 14px; }
+.rv-dialog > .rv-quote { margin-top: 4px; }
+.rv-textarea {
+  display: block; width: 100%; min-height: 128px; resize: vertical; margin-top: 6px;
+  font: inherit; font-size: 16px; line-height: 1.45; color: var(--navy);
+  padding: 10px 12px; background: #fff; border: 1.5px solid #A9B4C4; border-radius: var(--radius);
+}
+.rv-dialog > .rv-textarea { margin-top: 6px; }
+.rv-textarea:focus { border-color: var(--accent); outline: 2px solid var(--accent-tint); }
+.rv-dialog > .rv-dialog__count { margin-top: 4px; font-size: 12.5px; color: var(--muted); text-align: right; }
+.rv-dialog__error { font-size: 14px; font-weight: 600; line-height: 1.4; color: #9B1C1C; }
+.rv-dialog__error:empty { display: none; }
+.rv-dialog__actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.rv-dialog__actions .rv-btn { min-height: 44px; }
+/* "Marchează": marking mode (html.rv-marking), numbered pins over the page and their popover, numbers in
+   the list. main.js places the pins (top/left) from the marked elements; they never change the layout. */
+html.review-key { --rv-pin: #BE123C; --rv-pin-dark: #881337; --rv-pin-tint: #FFE4E6; }
+.rv-ui [hidden] { display: none !important; }
+/* while the list is open the help line gives way, so the bar (one more button row now) stays below the call header */
+.rv-panel:not([hidden]) ~ .rv-bar__text { display: none; }
+.rv-bar__actions .rv-btn--mark { grid-column: 1 / -1; }
+.rv-btn--mark { color: var(--rv-pin); border-color: var(--rv-pin); -webkit-tap-highlight-color: transparent; }
+.rv-btn--mark::before {
+  content: ""; flex: none; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--rv-pin); border: 2px solid #fff; box-shadow: 0 0 0 1.5px var(--rv-pin);
+}
+.rv-btn--mark[aria-pressed="true"] { color: #fff; background: var(--rv-pin); }
+@media (hover: hover) {
+  .rv-btn--mark:hover { color: var(--rv-pin-dark); background: var(--rv-pin-tint); }
+  .rv-btn--mark[aria-pressed="true"]:hover { color: #fff; background: var(--rv-pin-dark); }
+}
+html.rv-marking .rv-bar { background: var(--rv-pin-tint); border-top: 2px solid var(--rv-pin); }
+html.rv-marking .rv-bar__text { color: var(--rv-pin-dark); }
+/* while marking, a tap marks instead of selecting text or opening a link (cursor: pointer also makes iOS
+   send the tap to the page) */
+html.rv-marking main, html.rv-marking .site-header, html.rv-marking .site-footer {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent; /* the outline of the marked block is the feedback */
+}
+html.rv-marking main *, html.rv-marking .site-header *, html.rv-marking .site-footer * { cursor: pointer; }
+html.rv-marking .rv-pop, html.rv-marking .rv-pop * { cursor: auto; -webkit-user-select: text; user-select: text; }
+html.rv-marking .rv-pop .rv-btn { cursor: pointer; }
+html.rv-marking main :focus-visible, html.rv-marking .site-header :focus-visible, html.rv-marking .site-footer :focus-visible {
+  outline: 3px dashed var(--rv-pin); outline-offset: 2px;
+}
+.rv-hover { outline: 2px dashed var(--rv-pin) !important; outline-offset: 2px !important; }
+.rv-picked { outline: 3px solid var(--rv-pin) !important; outline-offset: 2px !important; }
+tr.rv-hover, tr.rv-picked, .table-wrap.rv-hover, .table-wrap.rv-picked { outline-offset: -3px !important; }
+tr.rv-hover > *, tr.rv-picked > * { background-color: rgba(190, 18, 60, 0.08); }
+.site-footer .rv-hover, .site-footer .rv-picked { outline-color: #FDA4AF !important; }
+.rv-pins { position: absolute; top: 0; left: 0; width: 0; height: 0; z-index: 15; } /* under the call header (20) */
+.rv-pins--head { inset: 0; width: auto; height: auto; z-index: 5; pointer-events: none; }
+.rv-pin {
+  position: absolute; top: 0; left: 0;
+  min-width: 30px; height: 30px; padding: 0 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font: inherit; font-size: 14px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums;
+  color: #fff; background: var(--rv-pin); border: 2px solid #fff; border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(11, 31, 58, 0.45);
+  cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent;
+}
+.rv-pin::before { content: ""; position: absolute; inset: -6px; } /* 42 px to tap */
+.rv-pin[aria-expanded="true"] { background: var(--navy); }
+.rv-pin:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.rv-pin--flash { animation: rv-pulse 0.8s ease-in-out 3; }
+@keyframes rv-pulse { 50% { transform: scale(1.3); } }
+@media (prefers-reduced-motion: reduce) { .rv-pin--flash { animation: none; background: var(--navy); } }
+.rv-pop {
+  position: absolute; top: 0; left: 0; z-index: 1;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: 12px; color: var(--navy); background: #fff; text-align: left;
+  font-size: 14px; line-height: 1.45;
+  border: 1px solid var(--line); border-top: 3px solid var(--rv-pin); border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(11, 31, 58, 0.3);
+  pointer-events: auto;
+}
+.rv-pop:focus { outline: none; }
+.rv-pop:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.rv-pop__title { font-size: 15px; font-weight: 700; }
+.rv-pop__meta { font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.rv-pop .rv-item__comment { max-height: 12em; overflow-y: auto; align-self: stretch; }
+/* taller than the room between the header and the bar (main.js sets max-height): the box scrolls as a whole,
+   its texts keep their full height, and "Șterge" / "Închide" stay visible at its bottom edge */
+.rv-pop--fit { overflow-y: auto; overscroll-behavior: contain; }
+.rv-pop--fit > * { flex-shrink: 0; }
+.rv-pop--fit .rv-quote, .rv-pop--fit .rv-item__comment { max-height: none; overflow: visible; }
+.rv-pop--fit .rv-pop__actions {
+  position: sticky; bottom: -12px; align-self: stretch; /* -12px: over the box's own bottom padding */
+  margin: 0 -12px -12px; padding: 8px 12px 12px; background: #fff; border-top: 1px solid var(--line);
+}
+.rv-pop__actions, .rv-item__actions, .rv-del { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.rv-pop__actions { margin-top: 2px; }
+.rv-del__ask { flex-basis: 100%; font-size: 14px; font-weight: 600; color: #9B1C1C; }
+.rv-btn--danger { color: #9B1C1C; border-color: #9B1C1C; }
+.rv-btn--danger-solid { color: #fff; background: #9B1C1C; border-color: #9B1C1C; }
+@media (hover: hover) {
+  .rv-btn--danger:hover { color: #9B1C1C; background: #FEF2F2; }
+  .rv-btn--danger-solid:hover { color: #fff; background: #7F1D1D; }
+}
+.rv-item__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.rv-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 24px; height: 24px; padding: 0 6px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 700; color: #fff; background: var(--rv-pin);
+}
+.rv-item__gone { font-size: 13px; font-style: italic; color: var(--muted); }
 
 /* ---------- Hero ---------- */
 .hero { padding: 32px 0 40px; }
@@ -332,6 +615,10 @@ html.review body::after {
   .strip strong { font-size: 14.5px; line-height: 1.3; }
   .strip span.sub { font-size: 12.5px; line-height: 1.35; margin-top: 2px; }
 }
+/* a strip of exactly 4 tiles (service pages) stays on one row instead of 3 + 1; 6 tiles stay 3 + 3 */
+@media (min-width: 1024px) {
+  .strip ul:has(> li:nth-child(4):last-child) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
 
 /* ---------- Cards ---------- */
 .cards {
@@ -365,6 +652,23 @@ table.prices thead tr { background: var(--bg-alt); }
 table.prices th, table.prices td { padding: 10px 10px; }
 @media (min-width: 560px) { table.prices th, table.prices td { padding: 11px 14px; } }
 table.prices tbody th { min-width: 8.5em; }
+/* phones: tighter cells, so the 4-column tables (display, back glass and housing) fit from 320px without
+   scrolling; the two long column titles break with &shy; in the pages. If a table still overflows (a narrower
+   screen, larger text), shadows at the edges show that it scrolls (the white "local" layers hide them while
+   there is nothing more to see on that side). */
+@media (max-width: 559px) {
+  table.prices th, table.prices td { padding: 10px 5px; }
+  table.prices tbody th { min-width: 5em; }
+  table.prices thead th { font-size: 13px; }
+  .table-wrap {
+    background:
+      linear-gradient(to right, #fff 30%, rgba(255, 255, 255, 0)) left center / 40px 100% no-repeat local,
+      linear-gradient(to left, #fff 30%, rgba(255, 255, 255, 0)) right center / 40px 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, rgba(11, 31, 58, 0.22), rgba(11, 31, 58, 0)) left center / 14px 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, rgba(11, 31, 58, 0.22), rgba(11, 31, 58, 0)) right center / 14px 100% no-repeat scroll,
+      #fff;
+  }
+}
 table.prices thead th { text-align: right; font-weight: 600; vertical-align: bottom; }
 table.prices thead th:first-child { text-align: left; }
 table.prices tbody tr { border-top: 1px solid var(--line); }
@@ -374,6 +678,14 @@ table.prices td.strong { font-weight: 600; }
 table.prices td.na { color: var(--muted); }
 table.prices td.wrap, table.prices th.wrap { white-space: normal; }
 table.prices .row-note { display: block; font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; white-space: normal; }
+/* a table of sentences (parts types on /garantie-si-piese/): left-aligned like text, not like prices */
+table.prices--text td, table.prices--text thead th { text-align: left; }
+/* desktop: the column titles of the long tables stay under the site header while the table scrolls by;
+   overflow: clip (not auto) so the wrapper is no scroll box and its rounded corners still clip */
+@media (min-width: 1024px) {
+  .table-wrap { overflow: clip; }
+  table.prices thead th { position: sticky; top: 108px; z-index: 2; background: var(--bg-alt); box-shadow: 0 1px 0 var(--line); }
+}
 .mark { color: var(--accent); font-weight: 700; }
 table.hours { width: 100%; max-width: 520px; border-collapse: collapse; font-size: 15.5px; font-variant-numeric: tabular-nums; }
 table.hours tr { border-top: 1px solid var(--line); }
@@ -392,6 +704,11 @@ table.hours td { text-align: right; padding: 12px 0; font-weight: 600; }
   font: inherit; font-size: 14px; cursor: pointer;
 }
 .chip:hover { border-color: var(--accent); color: var(--accent); }
+/* jump links to the sections of a long page: <nav aria-label="Pe această pagină"><ul class="chips"><li><a class="chip"> */
+a.chip { display: inline-flex; align-items: center; text-decoration: none; }
+nav .chips { list-style: none; padding: 0; margin: 0; }
+/* price search: call / WhatsApp / Samsung after "no result", "Programează" after the results (main.js) */
+.results > .search-actions { grid-column: 1 / -1; }
 .results { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
 .result {
   border: 1px solid var(--line); border-left: 3px solid var(--accent);
@@ -409,8 +726,13 @@ table.hours td { text-align: right; padding: 12px 0; font-weight: 600; }
 @media (min-width: 760px) { .gallery { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); } }
 .gallery .ph { padding: 10px; }
 .gallery .ph__text { font-size: 12.5px; }
-.gallery figure { display: flex; flex-direction: column; gap: 8px; }
+.gallery figure { display: flex; flex-direction: column; gap: 8px; max-width: 360px; } /* a lone photo is not blown up on desktop */
+/* two photos: two 360px tracks side by side, so the capped photos keep the normal gap instead of floating mid-row */
+@media (min-width: 760px) { .gallery:has(> figure:nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0, 360px)); } }
 .gallery figcaption { font-size: 13.5px; line-height: 1.4; color: var(--navy); }
+/* one photo with its caption outside a gallery (e.g. /cum-ajungi/): <figure class="photo--cap"><img class="photo"> */
+.photo--cap { display: flex; flex-direction: column; gap: 8px; max-width: 400px; }
+.photo--cap figcaption { font-size: 13.5px; line-height: 1.4; color: var(--navy); }
 
 /* ---------- Reviews ---------- */
 .rating-row { display: flex; flex-wrap: wrap; gap: 4px 20px; align-items: center; }
@@ -466,7 +788,8 @@ table.hours td { text-align: right; padding: 12px 0; font-weight: 600; }
 .tt-facade .tt-title { font-size: 15px; font-weight: 600; line-height: 1.35; }
 .tt-facade .tt-meta { font-size: 12px; color: var(--foot-muted); margin-top: 6px; display: block; }
 .tt-frame { width: 100%; aspect-ratio: 9 / 16; border: 0; border-radius: var(--radius); background: #000; }
-.tt-card .tt-link { font-size: 13.5px; color: var(--muted); }
+.tt-card .tt-link { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; font-size: 13.5px; color: var(--muted); }
+.tt-card .tt-link:hover { color: var(--navy); }
 
 /* ---------- Steps ---------- */
 .steps { list-style: none; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
@@ -481,6 +804,7 @@ table.hours td { text-align: right; padding: 12px 0; font-weight: 600; }
 .steps p { font-size: 15.5px; line-height: 1.5; }
 .two-col { display: grid; gap: 16px; align-items: start; grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr)); }
 .map-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.map-links > a:last-child:nth-child(odd) { grid-column: 1 / -1; } /* a third button (Apple Maps) gets the full row */
 
 /* ---------- Packeta / info boxes ---------- */
 .box {
@@ -512,11 +836,11 @@ table.hours td { text-align: right; padding: 12px 0; font-weight: 600; }
 .field input, .field select, .field textarea, .search-row input {
   font: inherit; font-size: 16px; color: var(--navy);
   min-height: 48px; padding: 10px 12px;
-  border: 1.5px solid #A9B4C4; border-radius: var(--radius); background: #fff;
+  border: 1.5px solid #6B7A90; border-radius: var(--radius); background: #fff;
   width: 100%;
 }
 .field textarea { min-height: 96px; resize: vertical; }
-.field input:focus, .field select:focus, .field textarea:focus, .search-row input:focus { border-color: var(--accent); outline: 2px solid var(--accent-tint); }
+.field input:focus, .field select:focus, .field textarea:focus, .search-row input:focus { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 1px; }
 fieldset.field { border: 0; padding: 0; margin: 0; }
 .choice { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; }
 .choice input { width: 20px; height: 20px; min-height: 0; accent-color: var(--accent); }
@@ -532,11 +856,18 @@ fieldset.field { border: 0; padding: 0; margin: 0; }
 /* ---------- Footer ---------- */
 .site-footer { background: var(--navy); color: var(--foot-ink); padding: 36px 0 44px; }
 .site-footer a { color: #fff; }
+.site-footer a:hover { color: var(--foot-muted); }
+.site-footer :focus-visible { outline-color: #fff; } /* the blue ring is too faint on navy */
 .foot-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
+/* from 1024px: 4 columns + 1 (as at 1280px) instead of 3 + 2, so the footer is shorter and no time range breaks in the middle */
+@media (min-width: 1024px) { .foot-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } }
 .foot-name { font-size: 18px; font-weight: 600; }
 .foot-addr { font-size: 14.5px; line-height: 1.55; color: var(--foot-muted); }
 .foot-list { list-style: none; padding: 0; }
 .foot-list a { min-height: 44px; display: flex; align-items: center; }
+/* a plain list of links in the page (404.html): 44px rows to tap */
+.link-list { list-style: none; padding: 0; }
+.link-list a { min-height: 44px; display: inline-flex; align-items: center; }
 .foot-meta { font-size: 13.5px; color: var(--foot-muted); display: flex; flex-direction: column; gap: 8px; }
 .foot-meta .todo { color: #FFE2A8; background: transparent; border-color: #FFE2A8; }
 .foot-title { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--foot-muted); margin-bottom: 4px; }
@@ -549,3 +880,111 @@ fieldset.field { border: 0; padding: 0; margin: 0; }
 
 /* Demo phase: link to the original photo on Facebook (remove at launch) */
 .src-link { display: inline-block; margin-top: 6px; font-size: 12px; color: var(--muted, #4A576C); text-decoration: underline; min-height: 24px; }
+
+/* ---------- Mobile pass (2026-11): lighter phone layout ---------- */
+/* "Vezi detalii": native details/summary that keeps secondary facts (full tables, notes) on the page for
+   search engines and AI assistants, folded on the first view */
+.more {
+  border: 1px solid var(--line); border-radius: var(--radius); background: #fff; max-width: 760px;
+}
+.more > summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 48px; padding: 8px 14px;
+  font-weight: 600; color: var(--navy);
+}
+.more > summary::-webkit-details-marker { display: none; }
+.more > summary::after {
+  content: ""; flex: none; width: 9px; height: 9px; margin: -4px 4px 0 0;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg);
+}
+.more[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+.more > summary:hover { color: var(--accent); }
+.more > .more-body { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 12px; }
+.more > .more-body > .table-wrap { margin: 0 -8px; }
+.section--alt .more { background: #fff; }
+
+/* horizontal scroller (photos, reviews) on phones, a grid from 760px */
+.scroller {
+  list-style: none; padding: 0 0 6px; margin: 0;
+  display: grid; gap: 10px; grid-auto-flow: column; grid-auto-columns: minmax(200px, 72%);
+  overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+}
+.scroller > * { scroll-snap-align: start; }
+.scroller--photos { grid-auto-columns: minmax(150px, 46%); }
+@media (min-width: 760px) {
+  .scroller { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); overflow: visible; }
+  .scroller--photos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.scroller figure { display: flex; flex-direction: column; gap: 6px; }
+.scroller figcaption { font-size: 13.5px; line-height: 1.4; }
+
+/* compact list of links with a price or a short line on the right (home services, "Vezi și") */
+.rows { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); max-width: 760px; }
+.rows > li { border-bottom: 1px solid var(--line); }
+.rows a {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto 10px; align-items: center; gap: 2px 12px;
+  min-height: 56px; padding: 10px 2px; color: var(--navy); text-decoration: none;
+}
+.rows a:hover .row-t { color: var(--accent); }
+.row-t { font-weight: 600; font-size: 16px; line-height: 1.3; }
+.row-p { font-weight: 600; font-size: 16px; color: var(--accent); white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
+.row-p small { font-size: 12.5px; font-weight: 500; color: var(--muted); }
+.row-d { grid-column: 1 / 3; font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+.rows a::after { content: "›"; grid-column: 3; grid-row: 1; font-size: 22px; line-height: 1; color: var(--ph-line); }
+
+/* the hero actions on a service page: one main button and WhatsApp (the header already has "Sună") */
+
+@media (max-width: 759px) {
+  .section { padding: 28px 0; }
+  .hero { padding: 20px 0 24px; }
+  .stack { gap: 14px; }
+  .section-head > .eyebrow { display: none; } /* section labels: noise on a phone, the h2 says it */
+  .h1 { font-size: 27px; line-height: 1.15; }
+  .h1--page { font-size: 26px; }
+  .h2 { font-size: 22px; }
+  .lead { font-size: 16px; }
+  .breadcrumb { padding-top: 10px; }
+  .breadcrumb + .section--first { padding-top: 14px; }
+  /* short facts strip: two columns of icon + title, the second line stays for wider screens */
+  .strip { padding: 12px 0; }
+  .strip ul { gap: 6px; }
+  .strip li { flex-direction: row; align-items: center; gap: 8px; padding: 8px 10px; }
+  .strip .icon-dot { width: 28px; height: 28px; }
+  .strip .icon-dot svg { width: 16px; height: 16px; }
+  .strip strong { font-size: 13.5px; line-height: 1.25; }
+  .strip span.sub { display: none; }
+  .faq-item { padding: 14px 0; }
+  .faq-item h2, .faq-item h3 { font-size: 16px; }
+  .faq-item p, .faq-item ul { font-size: 15px; }
+  .quote { padding: 14px; gap: 8px; }
+  .quote blockquote { font-size: 15px; }
+  .site-footer { padding: 28px 0 32px; }
+  .foot-grid { gap: 18px; }
+}
+.dl-plain { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; font-size: 15px; }
+.dl-plain dt { color: var(--muted); }
+.dl-plain dd { font-weight: 600; }
+
+/* ---------- /din-atelier/: one compact entry per repair, photo first where there is one ---------- */
+.jobs { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); max-width: 760px; }
+.job { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.job--photo { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: start; }
+@media (min-width: 560px) { .job--photo { grid-template-columns: 150px minmax(0, 1fr); gap: 16px; } }
+.job-img { aspect-ratio: 3 / 4; }
+.job-body { display: flex; flex-direction: column; gap: 3px; }
+.job-t { font-size: 17px; line-height: 1.3; font-weight: 600; }
+.job-work { font-size: 15px; line-height: 1.45; color: var(--ink-2); }
+.job-meta { font-size: 14px; line-height: 1.5; color: var(--muted); }
+.job-meta .job-price { color: var(--navy); font-weight: 600; }
+.job-meta a { display: inline-block; padding: 10px 0; margin: -10px 0; color: var(--accent); } /* 44px tall to tap, same line */
+
+@media (max-width: 759px) {
+  .photo--hero { aspect-ratio: 16 / 10; }
+  .scroller { align-items: start; }
+  /* footer: contact links in two columns as well (the e-mail address keeps a full row) */
+  .site-footer .foot-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; }
+  .site-footer .foot-list li:has(a[href^="mailto:"]) { grid-column: 1 / -1; }
+}
+.btn-row--hero .btn { flex: 1 1 auto; padding: 0 10px; white-space: nowrap; }
+@media (min-width: 760px) { .btn-row--hero { max-width: 460px; } }
