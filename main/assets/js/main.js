@@ -1329,8 +1329,7 @@
         return lines.join('\n');
       },
       buyback: function (f) { // short and structured; only phones that passed the brand and defect steps get here
-        var lines = ['Bună ziua! Cerere buy-back / trade-in'];
-        lines.push('Vreau: ' + (val(f, 'scop') || 'să vând telefonul'));
+        var lines = ['Bună ziua! Cerere buy-back: vreau să vând telefonul.'];
         lines.push('Telefon: ' + bbModel(f));
         lines.push('Memorie: ' + selectedText(f, 'memorie'));
         lines.push('Defecte fizice: nu'); // appearance on its own line: the owner decides on scratches (owner-answers B3.5)
@@ -1376,8 +1375,7 @@
         return lines.join('\n');
       },
       buyback: function (f) {
-        var lines = ['Hello! Buy-back / trade-in request'];
-        lines.push('I want to: ' + (val(f, 'scop') || 'sell my phone'));
+        var lines = ['Hello! Buy-back request: I would like to sell my phone.'];
         lines.push('Phone: ' + bbModel(f));
         lines.push('Storage: ' + selectedText(f, 'memorie'));
         lines.push('Physical defects: none');
