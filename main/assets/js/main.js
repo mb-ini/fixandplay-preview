@@ -1333,7 +1333,8 @@
         lines.push('Vreau: ' + (val(f, 'scop') || 'să vând telefonul'));
         lines.push('Telefon: ' + bbModel(f));
         lines.push('Memorie: ' + selectedText(f, 'memorie'));
-        lines.push('Stare: fără defecte fizice; ' + selectedText(f, 'stare').toLowerCase());
+        lines.push('Defecte fizice: nu'); // appearance on its own line: the owner decides on scratches (owner-answers B3.5)
+        lines.push('Aspect: ' + selectedText(f, 'stare').toLowerCase());
         if (val(f, 'baterie')) lines.push('Sănătate baterie: ' + (+val(f, 'baterie')) + '%');
         var acc = [val(f, 'cutie'), val(f, 'incarcator')].filter(Boolean);
         if (acc.length) lines.push('Am și: ' + acc.join(', '));
@@ -1342,7 +1343,7 @@
         return lines.join('\n');
       },
       bbWait: function (n) { return 'Cererea s-a deschis în WhatsApp. Ca să evităm mesajele repetate, poți deschide o nouă cerere peste ' + n + ' min.'; },
-      bbDup: 'Ai deschis deja exact această cerere. Te rugăm să aștepți răspunsul nostru pe WhatsApp.',
+      bbDup: 'Ai deschis deja exact această cerere. Dacă ai trimis-o, te rugăm să aștepți răspunsul nostru; dacă nu, scrie-ne direct pe WhatsApp.',
       bbOther: 'Momentan cumpărăm doar telefoane iPhone și Samsung, așa că nu putem face o ofertă pentru alte mărci sau alte aparate.',
       bbMismatch: 'Modelul nu se potrivește cu marca aleasă. Verifică marca și modelul.'
     },
@@ -1379,7 +1380,8 @@
         lines.push('I want to: ' + (val(f, 'scop') || 'sell my phone'));
         lines.push('Phone: ' + bbModel(f));
         lines.push('Storage: ' + selectedText(f, 'memorie'));
-        lines.push('Condition: no physical defects; ' + selectedText(f, 'stare').toLowerCase());
+        lines.push('Physical defects: none');
+        lines.push('Appearance: ' + selectedText(f, 'stare').toLowerCase());
         if (val(f, 'baterie')) lines.push('Battery health: ' + (+val(f, 'baterie')) + '%');
         var acc = [val(f, 'cutie'), val(f, 'incarcator')].filter(Boolean);
         if (acc.length) lines.push('I also have: ' + acc.join(', '));
@@ -1388,7 +1390,7 @@
         return lines.join('\n');
       },
       bbWait: function (n) { return 'Your request opened in WhatsApp. To avoid repeated messages, you can open a new request in ' + n + ' min.'; },
-      bbDup: 'You have already opened this exact request. Please wait for our reply on WhatsApp.',
+      bbDup: 'You have already opened this exact request. If you sent it, please wait for our reply; if not, message us directly on WhatsApp.',
       bbOther: 'For now we only buy iPhone and Samsung phones, so we cannot make an offer for other brands or other devices.',
       bbMismatch: 'The model does not match the brand you chose. Please check the brand and the model.'
     }
@@ -1442,7 +1444,7 @@
      visitor's own WhatsApp, so none of this can be enforced on a server. ---- */
   var BB_KEY = 'fp-buyback', BB_COOLDOWN = 5 * 60 * 1000, BB_DUP = 24 * 60 * 60 * 1000;
   // a word that starts one of these (digits may follow: "Watch6", "pixel7", "iPad10"); Romanian too ("tabletă", "ceas")
-  var BB_OTHER = /\b(pixel|google|xiaomi|redmi|poco|huawei|honor|oppo|realme|one ?plus|motorola|moto|nokia|sony|xperia|lg|htc|vivo|asus|zte|alcatel|tcl|lenovo|infinix|tecno|meizu|ulefone|doogee|blackview|allview|nothing|ipad|ipod|tab|tablet[a-zăâîșț]*|watch|smartwatch|ceas|gear|galaxy (book|fit)|macbook|airpods|buds)(?![a-zăâîșț])/i;
+  var BB_OTHER = /\b(pixel|xiaomi|redmi|poco|huawei|honor|oppo|realme|one ?plus|motorola|moto|nokia|sony|xperia|lg|htc|vivo|asus|zte|alcatel|tcl|lenovo|infinix|tecno|meizu|ulefone|doogee|blackview|allview|nothing ?(phone|\d)|ipad|ipod|tab|tablet[a-zăâîșț]*|watch|smartwatch|ceas|gear|galaxy (book|fit)|macbook|airpods|buds)(?![a-zăâîșț])/i;
   var bbMemory = {};
   function bbLoad() { // the newer of storage and memory (storage that can be read but not written keeps the old value)
     var o = null;
