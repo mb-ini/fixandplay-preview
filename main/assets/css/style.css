@@ -872,6 +872,13 @@ fieldset.field { border: 0; padding: 0; margin: 0; }
 .foot-meta { font-size: 13.5px; color: var(--foot-muted); display: flex; flex-direction: column; gap: 8px; }
 .foot-meta .todo { color: #FFE2A8; background: transparent; border-color: #FFE2A8; }
 .foot-title { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--foot-muted); margin-bottom: 4px; }
+/* ANPC row, full width under the columns: the official SAL pictogram (Ordin ANPC 449/2022 art. 2, linked to
+   reclamatiisal.anpc.ro; ANPC's own file, shown at its native 201x50, never scaled) + a text link to anpc.ro.
+   research/anpc-legal-2026-11.md */
+.foot-anpc { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.16); }
+.foot-sal { display: block; line-height: 0; flex: none; }
+.foot-sal img { display: block; width: 201px; height: 50px; max-width: none; }
+.foot-anpc-link { min-height: 44px; display: inline-flex; align-items: center; font-size: 14px; }
 
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
